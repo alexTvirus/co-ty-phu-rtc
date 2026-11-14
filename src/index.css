@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/* ===== Xúc xắc 3D lăn lóc (DicePair.tsx) ===== */
+:root {
+  --die: 3.5rem;
+}
+@media (min-width: 768px) {
+  :root {
+    --die: 4.5rem;
+  }
+}
+
+.dice-pair {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--die) * 0.4);
+  height: calc(var(--die) * 1.4);
+}
+.dice-slot {
+  position: relative;
+  width: var(--die);
+  height: var(--die);
+}
+.dice-travel,
+.dice-hop,
+.dice-cube {
+  position: absolute;
+  inset: 0;
+}
+.dice-hop {
+  perspective: calc(var(--die) * 8);
+}
+.dice-cube {
+  transform-style: preserve-3d;
+  transform: rotateX(var(--fx)) rotateY(var(--fy)); /* tư thế nghỉ = tư thế cuối của animation */
+}
+.dice-face {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  padding: 7%;
+  background: #fff;
+  border: 3px solid #0f172a;
+  border-radius: 18%;
+  box-shadow: inset 0 0 0 2px #f1f5f9;
+}
+.dice-face-1 { transform: translateZ(calc(var(--die) / 2)); }
+.dice-face-6 { transform: rotateY(180deg) translateZ(calc(var(--die) / 2)); }
+.dice-face-3 { transform: rotateY(90deg) translateZ(calc(var(--die) / 2)); }
+.dice-face-4 { transform: rotateY(-90deg) translateZ(calc(var(--die) / 2)); }
+.dice-face-2 { transform: rotateX(90deg) translateZ(calc(var(--die) / 2)); }
+.dice-face-5 { transform: rotateX(-90deg) translateZ(calc(var(--die) / 2)); }
+
+.dice-shadow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -7%;
+  height: 20%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  filter: blur(3px);
+}
+
+.dice-rolling.dice-n-1 .dice-travel { animation: dice-travel-1 var(--dice-ms) cubic-bezier(0.16, 0.7, 0.3, 1) both; }
+.dice-rolling.dice-n-2 .dice-travel { animation: dice-travel-2 var(--dice-ms) cubic-bezier(0.16, 0.7, 0.3, 1) both; }
+.dice-rolling.dice-n-1 .dice-hop { animation: dice-hop-1 var(--dice-ms) linear both; }
+.dice-rolling.dice-n-2 .dice-hop { animation: dice-hop-2 var(--dice-ms) linear both; }
+.dice-rolling.dice-n-1 .dice-cube { animation: dice-spin-1 var(--dice-ms) cubic-bezier(0.2, 0.6, 0.25, 1) both; }
+.dice-rolling.dice-n-2 .dice-cube { animation: dice-spin-2 var(--dice-ms) cubic-bezier(0.2, 0.6, 0.25, 1) both; }
+.dice-rolling.dice-n-1 .dice-shadow { animation: dice-shadow-1 var(--dice-ms) linear both; }
+.dice-rolling.dice-n-2 .dice-shadow { animation: dice-shadow-2 var(--dice-ms) linear both; }
+
+/* Di chuyển ngang/dọc trên mặt bàn: bị tung từ mép vào rồi chậm dần */
+@keyframes dice-travel-1 {
+  0% { transform: translate(calc(var(--die) * -2.3), calc(var(--die) * -1)); opacity: 0; }
+  4% { opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+@keyframes dice-travel-2 {
+  0% { transform: translate(calc(var(--die) * 2.3), calc(var(--die) * -0.8)); opacity: 0; }
+  4% { opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+
+/* Nảy lên xuống, mỗi lần nảy thấp dần (animation-timing-function áp cho đoạn bắt đầu từ keyframe đó) */
+@keyframes dice-hop-1 {
+  0% { transform: translateY(calc(var(--die) * -1.2)); animation-timing-function: ease-in; }
+  18% { transform: translateY(0); animation-timing-function: ease-out; }
+  26% { transform: translateY(calc(var(--die) * -0.8)); animation-timing-function: ease-in; }
+  34% { transform: translateY(0); animation-timing-function: ease-out; }
+  40% { transform: translateY(calc(var(--die) * -0.35)); animation-timing-function: ease-in; }
+  46% { transform: translateY(0); animation-timing-function: ease-out; }
+  50.5% { transform: translateY(calc(var(--die) * -0.14)); animation-timing-function: ease-in; }
+  55% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+@keyframes dice-hop-2 {
+  0% { transform: translateY(calc(var(--die) * -1.1)); animation-timing-function: ease-in; }
+  21% { transform: translateY(0); animation-timing-function: ease-out; }
+  29% { transform: translateY(calc(var(--die) * -0.7)); animation-timing-function: ease-in; }
+  38% { transform: translateY(0); animation-timing-function: ease-out; }
+  43.5% { transform: translateY(calc(var(--die) * -0.3)); animation-timing-function: ease-in; }
+  49% { transform: translateY(0); animation-timing-function: ease-out; }
+  53% { transform: translateY(calc(var(--die) * -0.1)); animation-timing-function: ease-in; }
+  57% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+/* Xoay nhiều vòng quanh 2 trục rồi dừng đúng mặt kết quả (--fx/--fy là tư thế cuối) */
+@keyframes dice-spin-1 {
+  0% { transform: rotateX(calc(var(--fx) - 1260deg)) rotateY(calc(var(--fy) + 1440deg)); }
+  100% { transform: rotateX(var(--fx)) rotateY(var(--fy)); }
+}
+@keyframes dice-spin-2 {
+  0% { transform: rotateX(calc(var(--fx) + 1440deg)) rotateY(calc(var(--fy) - 1080deg)); }
+  100% { transform: rotateX(var(--fx)) rotateY(var(--fy)); }
+}
+
+/* Bóng trên mặt bàn nhỏ và nhạt khi xúc xắc bay cao */
+@keyframes dice-shadow-1 {
+  0% { transform: scale(0.35); opacity: 0.15; }
+  18% { transform: scale(1); opacity: 0.55; }
+  26% { transform: scale(0.55); opacity: 0.25; }
+  34% { transform: scale(1); opacity: 0.55; }
+  40% { transform: scale(0.8); opacity: 0.4; }
+  46% { transform: scale(1); opacity: 0.55; }
+  50.5% { transform: scale(0.92); opacity: 0.5; }
+  55%, 100% { transform: scale(1); opacity: 0.55; }
+}
+@keyframes dice-shadow-2 {
+  0% { transform: scale(0.35); opacity: 0.15; }
+  21% { transform: scale(1); opacity: 0.55; }
+  29% { transform: scale(0.6); opacity: 0.25; }
+  38% { transform: scale(1); opacity: 0.55; }
+  43.5% { transform: scale(0.82); opacity: 0.4; }
+  49% { transform: scale(1); opacity: 0.55; }
+  53% { transform: scale(0.93); opacity: 0.5; }
+  57%, 100% { transform: scale(1); opacity: 0.55; }
+}
